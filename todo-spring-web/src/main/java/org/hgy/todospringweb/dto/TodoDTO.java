@@ -21,4 +21,9 @@ public class TodoDTO {
 		this.title = entity.getTitle();
 		this.done = entity.isDone();
 	}
+	public TodoEntity toTodoEntity() {
+		TodoEntity todoEntity = TodoEntity.builder()
+								.id(id).title(title).done(done).build();
+		return todoEntity;						
+	}
 }
