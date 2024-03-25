@@ -1,12 +1,13 @@
 package org.hgy.todospringweb.controller;
 
 import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.persistence.EntityNotFoundException;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,98 +16,119 @@ import org.hgy.todospringweb.model.TodoEntity;
 import org.hgy.todospringweb.dto.ResponseDTO;
 import org.hgy.todospringweb.service.TodoService;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Collection;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("todo")
+@Slf4j
 public class TodoController {
 	@Autowired
 	private TodoService service;
 	
-	@GetMapping("/testTodo")
-	public ResponseEntity<?> testTodo() {
-		String str = service.testService();
+	@PostMapping
+	public ResponseEntity<?> createTodo(@RequestBody TodoDTO dto) {
+		try {
+			String temporaryUserId = "temporary-user";
+			
+			int i = 0;
+			// 1. entity로 변환
+			TodoEntity entity = TodoDTO.toEntity(dto);
+			log.info("create {}:: {}", ++i, entity.getId());
+			
+			// 2. id 초기화
+			entity.setId(null);
+			log.info("create {}:: {}", ++i, entity.getId());
+			
+			// 3. set user id, 추후 수정 예정
+			entity.setUserId(temporaryUserId);
+			
+			// 4. 서비스를 통해 Todo 엔티티 생성
+			List<TodoEntity> entities = service.createTodo(entity);
+			log.info("create {}:: {}", ++i, entity.getId());
+			
+			// 5. 자바 스트림을 이용해 리턴된 엔티티 리스트를 TodoDTO 리스트로 변환
+			List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
+			
+			// 6. ResponseDTO 초기화
+			ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+			
+			// 7. ResponseDTO 리턴
+			return ResponseEntity.ok(response);			
+		} catch(Exception e) {
+			// 8. 에러나는 경우 error 메시지 생성 후 리턴
+			
+			String error = e.getMessage();
+			ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().error(error).build();
+			return ResponseEntity.badRequest().body(response);
+		}
+	}
+	
+	@GetMapping
+	public ResponseEntity<?> retreieveTodoList() {
+		String temporarayUserId = "temporary-user";
 		
-//		List<TodoDTO> todoMockList = new ArrayList<>();
-//		todoMockList.add(new TodoDTO("id", "msg", true));
-//		ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(todoMockList).build();
-		List<String> list = new ArrayList<>();
-		list.add(str);
-		ResponseDTO<String> response = ResponseDTO.<String>builder().data(list).build();
+		List<TodoEntity> entities = service.retrieve(temporarayUserId);
+		List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
+		ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
 		
 		return ResponseEntity.ok().body(response);
 	}
-//	@GetMapping("/create")
-//	public String createTodo(@RequestBody TodoDTO todoDTO) {
-//		return todoDTO.getTitle();
-//	}
-	@GetMapping("/create")
-	public ResponseEntity<?> createTodo(@RequestBody(required = false) TodoDTO todoDTO) {
-		//create Todo
-		if(todoDTO == null) {
-			todoDTO = TodoDTO.builder().title("임시 제목").done(false).build();
-		}
+	
+	@PutMapping
+	public ResponseEntity<?> updateTodo(@RequestBody TodoDTO dto) {
+		String temporaryUserId = "temporary-user";
 		
-		TodoEntity todo = todoDTO.toTodoEntity();
-		service.createTodo(todo);
+		// 1. dto -> entity
+		TodoEntity entity = TodoDTO.toEntity(dto);
 		
-		//Found todo to return to user
-		TodoEntity todoFound = service.selectTodo(todo.getId());
-		TodoDTO todoDTOToSubmit = new TodoDTO(todoFound);
-		List<TodoDTO> data = new ArrayList<>();
-		data.add(todoDTOToSubmit);
-		ResponseDTO<TodoDTO> responseDTO = ResponseDTO.<TodoDTO>builder().data(data).build();
+		// 2. id 초기화, 인증, 나중에 수정
+		entity.setUserId(temporaryUserId);
 		
-		return ResponseEntity.ok().body(responseDTO);
+		// 3. update entity and get list of entity
+		List<TodoEntity> entities = service.update(entity);
+		
+		// 4. entity list -> dto list by java stream
+		List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
+		
+		// 5. initialize ResponseDTO by using TodoDTO transformed
+		ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+		
+		return ResponseEntity.ok(response);
 	}
 	
-	@GetMapping("/retrieve")
-	public ResponseEntity<?> retreiveTodo(@RequestParam(name="id") String id)	{
-		ResponseEntity<ResponseDTO<TodoDTO>> responseEntity;
+	@DeleteMapping
+	public ResponseEntity<?> deleteTodo(@RequestBody TodoDTO dto) {
 		try {
-			TodoEntity todoEntity = service.selectTodo(id);
-			ResponseDTO<TodoDTO> responseDTO = TodoEntityToResponseDTO(todoEntity);
-			responseEntity = ResponseEntity.ok(responseDTO);
-		} catch(EntityNotFoundException ex) {
-			ResponseDTO<TodoDTO> responseDTO = ResponseDTO.<TodoDTO>builder().error("해당 id로 찾지 못했습니다.").build();
-			responseEntity = ResponseEntity.status(500).body(responseDTO);
+			String temporaryUserId = "temporary-user";
+			
+			// 1. dto -> entity
+			TodoEntity entity = TodoDTO.toEntity(dto);
+			
+			// 2. set user id, 추후 수정
+			entity.setUserId(temporaryUserId);
+			
+			// 3. delete entity
+			List<TodoEntity> entities = service.delete(entity);
+			
+			// 4. entitiy list -> dto list
+			List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
+			
+			// 5. init REsponseEntity
+			ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+			
+			// 6. return
+			return ResponseEntity.ok(response);
+		} catch(Exception e) {
+			// 7. exception
+			String error = e.getMessage();
+			ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().error(error).build();
+			return ResponseEntity.badRequest().body(response);
+			
+			
 		}
-		return responseEntity; 
-	}
-	@GetMapping("/check")
-	public ResponseEntity<?> updateTodo(@RequestParam(name="id") String id){
-		ResponseEntity<ResponseDTO<TodoDTO>> responseEntity;		
-		
-		try {
-			service.CheckTodo(id);
-			TodoEntity todoEntity = service.selectTodo(id);
-			ResponseDTO<TodoDTO> responseDTO = TodoEntityToResponseDTO(todoEntity);
-			responseEntity = ResponseEntity.ok(responseDTO);
-		} catch(EntityNotFoundException ex) {
-			ResponseDTO<TodoDTO> responseDTO = ResponseDTO.<TodoDTO>builder().error("해당 id로 찾지 못했습니다.").build();
-			responseEntity = ResponseEntity.status(500).body(responseDTO);
-		}
-		
-		return responseEntity; 
-	}
-	@GetMapping("/delete")
-	public ResponseEntity<?> deleteTodo(@RequestParam String id) {
-		service.deleteTodo(id);
-		List<String> data = new ArrayList<>();
-		data.add("삭제 요청 끝");
-		ResponseDTO<String> responseDTO = ResponseDTO.<String>builder().data(data).build();
-		return ResponseEntity.ok().body(responseDTO);
-	}
-	
-	/* 이 아래 HELPER */
-	
-	private ResponseDTO<TodoDTO> TodoEntityToResponseDTO(TodoEntity todoEntity) {
-		TodoDTO todoDTO = new TodoDTO(todoEntity);
-		List<TodoDTO> data = new ArrayList<>();
-		data.add(todoDTO);
-		ResponseDTO<TodoDTO> responseDTO = ResponseDTO.<TodoDTO>builder().data(data).build();
-		
-		return responseDTO;
 	}
 
 }

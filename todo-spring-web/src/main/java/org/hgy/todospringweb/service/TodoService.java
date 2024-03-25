@@ -1,52 +1,76 @@
 package org.hgy.todospringweb.service;
 
-import org.springframework.stereotype.Service;
-
 import jakarta.persistence.EntityNotFoundException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.hgy.todospringweb.persistence.TodoRepository;
-
 import java.util.List;
-
+import java.util.Optional;
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.hgy.todospringweb.persistence.TodoRepository;
 import org.hgy.todospringweb.model.TodoEntity;
 
-
+@Slf4j
 @Service
 public class TodoService {
 	@Autowired
-	private TodoRepository repository;
+	TodoRepository repository;
 	
-//	private JpaRepository<TodoEntity, String> repository;
-	
-	public String testService() {
-		TodoEntity entity = TodoEntity.builder().title("My first Todo item").build();
+	public List<TodoEntity> createTodo(final TodoEntity entity) {
+		validate(entity);
+		log.info("Entity Id: {} is saved.", entity.getId());
 		repository.save(entity);
-		TodoEntity savedEntity = repository.findById(entity.getId()).get();
-		
-		return String.format("%s %s %d", savedEntity.getId(), savedEntity.getTitle(), repository.count());
+		log.info("Entity Id: {} is saved.", entity.getId());
+		return repository.findByUserId(entity.getUserId());
 	}
-	public void createTodo(TodoEntity todo) {
-		repository.save(todo);
-	}
-	public TodoEntity selectTodo(String id) {
-		return repository.getReferenceById(id);
-	}
-	public List<TodoEntity> retreiveTodoByUserId(String userId) {
+	
+	public List<TodoEntity> retrieve(final String userId) {
+		log.info("find by userID {}", userId);
 		return repository.findByUserId(userId);
 	}
-	public void UpdateTodo(String id, String nextTitle) {
-		TodoEntity entity = repository.getReferenceById(id);
-		entity.setTitle(nextTitle);
-		repository.save(entity);
+	
+	public List<TodoEntity> update(final TodoEntity entity) {
+		validate(entity);
+		
+		log.info("update {}", entity.toString());
+		final Optional<TodoEntity> original = repository.findById(entity.getId());
+		
+		original.ifPresent(todo -> {
+			todo.setTitle(entity.getTitle());
+			todo.setDone(entity.isDone());
+			
+			repository.save(todo);
+		});
+		
+		return retrieve(entity.getUserId());
 	}
-	public void CheckTodo(String id) {
-		TodoEntity entity = repository.getReferenceById(id);
-		entity.setDone(!entity.isDone());
-		repository.save(entity);
+	
+	public List<TodoEntity> delete(final TodoEntity entity) {
+		// 1. validation
+		validate(entity);
+		
+		try {
+			// 2. try to delete
+			repository.delete(entity);
+		} catch(Exception e) {
+			//3 if exception occured, logging id
+			log.error("error deleting entitty", entity.getId(), e);
+			
+			//4. throw exception to controller, 새로운 exception 오브젝트를 리턴해서 db 내부로직을 캡슐화
+			throw new RuntimeException("error deleting entity " + entity.getId());
+		}
+		// 5. return new Todo List
+		return retrieve(entity.getUserId());
 	}
-	public void deleteTodo(String id) {
-		repository.deleteById(id);
+
+	private void validate(TodoEntity entity) {
+		if(entity == null) {
+			log.warn("entity cannot be null");
+			throw new RuntimeException("Entity cannot be null");
+		}
+		if(entity.getUserId() == null) {
+			log.warn("unknown user.");
+			throw new RuntimeException("unknwon user");
+		}
 	}
 }
