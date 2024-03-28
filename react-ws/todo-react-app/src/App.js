@@ -3,39 +3,23 @@ import Todo from "./Todo"
 import AddTodo from "./AddTodo"
 import React, {useState, useEffect} from "react"
 import {Container, List, Paper } from "@mui/material"
+import { call } from "./ApiService"
 
 function App() {
   const [items, setItems] = useState([]);
 
   useEffect( () =>  {
-    const requestOptions = {
-      method: "GET",
-      headers: { "Content-Type": "application/json"},
-    }
-
-    fetch("http://localhost:8080/todo", requestOptions)
-    .then((response) => response.json())
-    .then(
-      (response) => {
-        setItems(response.data)
-      },
-      (error) => {
-
-      }
-    );
+    call("/todo", "GET", null)
+    .then((response) => setItems(response.data));
   }, []);
 
   const addItem = (item) =>  {
-    item.id = "ID-" + items.length;
-    item.done = false;
-    items.push(item)
-    setItems([...items])
-    //setItems([...items, item]); // 업데이트는 반드시 setItems를 이용
-    console.log("items: ", items);
+    call("/todo", "POST", item)
+    .then((response) => setItems(response.data))
   }
   const deleteItem = (item) => {
-    const newItems = items.filter(e => e.id !== item.id);
-    setItems([...newItems])
+    call("/todo", "DELETE", item)
+    .then((response) => setItems(response.data))
   }
   const editItem = () => {
     setItems([...items])
