@@ -21,8 +21,9 @@ function App() {
     call("/todo", "DELETE", item)
     .then((response) => setItems(response.data))
   }
-  const editItem = () => {
-    setItems([...items])
+  const editItem = (item) => {
+    call("/todo", "PUT", item)
+    .then((response) => setItems(response.data))
   }
 
   let todoItems = items.length > 0 && 

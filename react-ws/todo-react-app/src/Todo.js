@@ -6,44 +6,35 @@ import DeleteOutlined from "@mui/icons-material/DeleteOutlined"
 const Todo = (props) => {
     const [item, setItem] = useState(props.item);
     const [readOnly, setReadOnly] = useState(true);
+    const [titleMemory, setTitleMemory] = useState("");
     const deleteItem = props.deleteItem;
     const editItem = props.editItem;
-    const [titleMemory, setTitleMemory] = useState("");
 
     // deletEventHandler 작성
     const deleteEventHandler = () => {
         deleteItem(item);
     }
     const editEventHandler = (e) => {
-        item.title = e.target.value;
-        // 되기는 하는 데 코드짜기 귀찮아서 App에서 처리했나?
-        // setItem(
-        //     {
-        //         id: item.id,
-        //         title: item.title,
-        //         done: item.done
-        //     }
-        // )
-        editItem();
+        setItem({...item, title: e.target.value});
     }
     const turnOffReadOnly = () => {
         setTitleMemory(item.title);
-        console.log(titleMemory);
+        // console.log(titleMemory);
         setReadOnly(false);
     }
     const turnOnReadOnly = (e) => {
         console.log(e);
         if(e.key === "Enter") {
             setReadOnly(true);
+            editItem(item);
         } else if(e.key ==="Escape") {
             item.title = titleMemory;
-            editItem();
             setReadOnly(true);
         }
     }
     const checkboxEventHandler = (e) => {
         item.done = e.target.checked;
-        editItem();
+        editItem(item);
     }
 
     return (
