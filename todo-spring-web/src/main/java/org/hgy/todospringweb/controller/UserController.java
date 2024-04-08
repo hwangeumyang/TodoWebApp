@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 @Slf4j
 @RestController
@@ -24,6 +27,9 @@ public class UserController {
 	@Autowired
 	private TokenProvider tokenProvider;
 	
+	//bean으로 작성해도 됨.
+	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
 		// 아이디 패스워드로 새로 객체 생성한 다음에 변환해서 전부 보내는 건 낭비같음.
@@ -34,7 +40,7 @@ public class UserController {
 			}
 			UserEntity user = UserEntity.builder()
 					.username(userDTO.getUsername())
-					.password(userDTO.getPassword())
+					.password(passwordEncoder.encode(userDTO.getPassword()))
 					.build();
 			UserEntity registeredUser = userService.create(user);
 			UserDTO responseUserDTO = UserDTO.builder()
@@ -55,7 +61,8 @@ public class UserController {
 	public ResponseEntity<?> authenticate(@RequestBody UserDTO userDTO) {
 		UserEntity user = userService.getByCredentials(
 				userDTO.getUsername(),
-				userDTO.getPassword());
+				userDTO.getPassword(),
+				passwordEncoder);
 		
 		if(user != null) {
 			final String token = tokenProvider.create(user);

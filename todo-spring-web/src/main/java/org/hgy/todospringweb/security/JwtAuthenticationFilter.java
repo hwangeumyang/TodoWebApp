@@ -41,14 +41,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				
 				AbstractAuthenticationToken authentication
 					= new UsernamePasswordAuthenticationToken(
-							userId, // 보통 UserDetails라는 오브젝트를 넣음
-							null,
-							AuthorityUtils.NO_AUTHORITIES);
+							userId // 보통 UserDetails라는 오브젝트를 넣음
+							, null
+							, AuthorityUtils.NO_AUTHORITIES);
 				authentication.setDetails(
 								new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 				securityContext.setAuthentication(authentication);
-				SecurityContextHolder.setContext(securityContext);	
+				SecurityContextHolder.setContext(securityContext);
+				
+				
 			}
 		} catch(Exception ex) {
 			logger.error("could not set user authentication in security context");

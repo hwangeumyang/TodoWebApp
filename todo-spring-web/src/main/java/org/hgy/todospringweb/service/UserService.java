@@ -5,6 +5,8 @@ import org.hgy.todospringweb.persistence.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Slf4j
 @Service
@@ -25,8 +27,14 @@ public class UserService {
 		return userRepository.save(userEntity);
 	}
 	
-	public UserEntity getByCredentials(final String username, final String password) {
-		return userRepository.findByUsernameAndPassword(username, password);
+	public UserEntity getByCredentials(final String username
+			, final String password, final PasswordEncoder encoder) {
+		final UserEntity originalUser = userRepository.findByUsername(username);
+		
+		if(originalUser != null && encoder.matches(password, originalUser.getPassword())) {
+			return originalUser;
+		}
+		return null;
 	}
 
 }
