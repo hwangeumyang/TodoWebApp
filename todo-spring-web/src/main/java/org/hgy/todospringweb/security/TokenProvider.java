@@ -42,7 +42,8 @@ public class TokenProvider {
 			return Jwts.parser()
 					.verifyWith(SECRET_KEY).build()
 					.parseSignedClaims(token)
-					.getPayload().getSubject();
+					.getPayload()
+					.getSubject();
 		} catch(JwtException e) {
 			// 실퍃할 경우, 책에서는 이에 대해 다루지 않으므로 생략
 			throw new UnsupportedOperationException();
