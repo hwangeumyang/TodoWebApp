@@ -21,7 +21,8 @@ public class TokenProvider {
 	public String create(UserEntity entity) {	
 		Date expiryDate = Date.from(
 				Instant.now()
-				.plus(1, ChronoUnit.DAYS));
+				.plus(30, ChronoUnit.SECONDS));
+//				.plus(1, ChronoUnit.DAYS));
 		log.info("secret_key" + SECRET_KEY.toString());
 		log.debug("secret_key" + SECRET_KEY);
 
@@ -39,6 +40,15 @@ public class TokenProvider {
 		try {
 			log.info("secret_key" + SECRET_KEY.toString());
 			log.debug("secret_key" + SECRET_KEY.toString());
+//			var claims = Jwts.parser()
+//					.verifyWith(SECRET_KEY).build()
+//					.parseSignedClaims(token);
+//			if(claims.getPayload().getExpiration().after(new Date())) {
+//				return claims.getPayload().getSubject();
+//			}
+//			
+//			throw new RuntimeException("Expired token");  
+					
 			return Jwts.parser()
 					.verifyWith(SECRET_KEY).build()
 					.parseSignedClaims(token)
@@ -48,7 +58,6 @@ public class TokenProvider {
 			// 실퍃할 경우, 책에서는 이에 대해 다루지 않으므로 생략
 			throw new UnsupportedOperationException();
 		}
-		
 	}
 
 }

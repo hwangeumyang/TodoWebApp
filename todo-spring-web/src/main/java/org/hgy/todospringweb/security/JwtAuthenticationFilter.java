@@ -53,6 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				
 			}
 		} catch(Exception ex) {
+			logger.error(ex);
 			logger.error("could not set user authentication in security context");
 		}
 		
@@ -69,5 +70,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 		return null;
 	}
+
 
 }
