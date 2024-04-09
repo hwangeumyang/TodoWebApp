@@ -19,6 +19,11 @@ export function call(api, method, request) {
     return fetch(options.url, options).then((response) => {
         if(response.status===200) {
             return response.json();
+        } else if(response.status==403) {
+            window.location.href="/login"; // redirect
+        } else {
+            Promise.reject(response);
+            throw Error(response);
         }
     }).catch((error) => {
         console.log("http error");
