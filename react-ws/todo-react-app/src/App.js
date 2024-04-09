@@ -2,15 +2,24 @@ import './App.css';
 import Todo from "./Todo"
 import AddTodo from "./AddTodo"
 import React, {useState, useEffect} from "react"
-import {Container, List, Paper } from "@mui/material"
-import { call } from "./service/ApiService"
+import {Container, List, Paper, Grid, Button, AppBar, Toolbar, Typography } from "@mui/material"
+import { call, signout } from "./service/ApiService"
+import LoadingPage from "./LoadingPage"
 
 function App() {
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect( () =>  {
     call("/todo", "GET", null)
-    .then((response) => setItems(response.data));
+    .then((response) => {
+      console.log(response);
+      if(response.data) {
+        setItems(response.data);
+        setLoading(false);
+      }
+    });
+
   }, []);
 
   const addItem = (item) =>  {
@@ -35,13 +44,43 @@ function App() {
     </Paper>
   )
 
-  return (
-    <div className="App">
+  let navigationBar = (
+    <AppBar position="static">
+      <Toolbar>
+        <Grid justifyContent="space-between" container>
+          <Grid item>
+            <Typography variant="h6">오늘의 할일</Typography>
+          </Grid>
+          <Grid item>
+            <Button color="inherit" raised onClick={signout}>
+              로그아웃
+            </Button>
+          </Grid>
+        </Grid>
+      </Toolbar>
+    </AppBar>
+  );
+
+  //loading아닐 때
+  let todoListPage = (
+    <div>
+      {navigationBar}
       <Container maxWidth="md">
         <AddTodo addItem={addItem}/>
         <div className="TodoList">{todoItems}</div>
       </Container>
     </div>
+  );
+  //loading
+  let loadingPage = <LoadingPage></LoadingPage>;
+  let content = loadingPage;
+
+  if(!loading) {
+    content = todoListPage;
+  }
+
+  return (
+    <div className="App">{content}</div>
   );
 }
 

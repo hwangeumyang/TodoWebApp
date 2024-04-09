@@ -28,7 +28,7 @@ export function call(api, method, request) {
         if(response.status===200) {
             return response.json();
         } else if(response.status==403) {
-            window.location.href="/login"; // redirect
+            // window.location.href="/login"; // redirect
         } else if(response.status==400) {
             alert("login failed");
             console.log(response);
@@ -55,4 +55,8 @@ export function signin(userDTO) {
         .catch((error) => {
             console.log("error", error);
         });
+}
+export function signout() {
+    localStorage.setItem("ACCESS_TOKEN", null);
+    window.location.href = "/login";
 }
