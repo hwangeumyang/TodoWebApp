@@ -13,12 +13,12 @@ function App() {
   useEffect( () =>  {
     call("/todo", "GET", null)
     .then((response) => {
-      console.log(response);
-      if(response.data) {
-        setItems(response.data);
-        setLoading(false);
-      }
-    });
+      // if(!response){
+      //   // window.location.href="/login";
+      // }
+      setItems(response.data);
+      setLoading(false);
+    })
 
   }, []);
 
@@ -52,7 +52,7 @@ function App() {
             <Typography variant="h6">오늘의 할일</Typography>
           </Grid>
           <Grid item>
-            <Button color="inherit" raised onClick={signout}>
+            <Button color="inherit" raised="true" onClick={signout}>
               로그아웃
             </Button>
           </Grid>

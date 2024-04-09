@@ -8,6 +8,9 @@ export function call(api, method, request) {
 
     //get access token and append authorization.
     const accessToken = localStorage.getItem("ACCESS_TOKEN");
+    if(accessToken == null || accessToken=="null") {
+        window.location.href="/login";
+    }
     if(accessToken && accessToken !== null) {
         headers.append("Authorization", "Bearer " + accessToken)
     }
@@ -24,11 +27,12 @@ export function call(api, method, request) {
     }
 
     return fetch(options.url, options).then((response) => {
-        console.log(response);
+        console.log("response", response);
+        // localStorage.setItem("res", response);
         if(response.status===200) {
             return response.json();
         } else if(response.status==403) {
-            // window.location.href="/login"; // redirect
+            window.location.href="/login"; // redirect
         } else if(response.status==400) {
             alert("login failed");
             console.log(response);
