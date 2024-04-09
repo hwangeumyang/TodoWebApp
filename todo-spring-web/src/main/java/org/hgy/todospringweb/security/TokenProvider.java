@@ -21,8 +21,8 @@ public class TokenProvider {
 	public String create(UserEntity entity) {	
 		Date expiryDate = Date.from(
 				Instant.now()
-				.plus(30, ChronoUnit.SECONDS));
-//				.plus(1, ChronoUnit.DAYS));
+//				.plus(30, ChronoUnit.SECONDS));
+				.plus(1, ChronoUnit.DAYS));
 		log.info("secret_key" + SECRET_KEY.toString());
 		log.debug("secret_key" + SECRET_KEY);
 
