@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -81,6 +81,15 @@ public class UserController {
 					.body(responseDTO);
 		}
 	}
+	
+	//확인용, 실제 서버 배포용 코드에는 사용하면 안됨.
+//	@PostMapping("/users")
+//	public ResponseEntity<?> users(){
+//		List<UserEntity> users = userService.getAllUsers();
+//		
+//		ResponseDTO<UserEntity> responseDTO = ResponseDTO.<UserEntity>builder().data(users).build();
+//		return ResponseEntity.ok(responseDTO);
+//	}
 	
 	
 	

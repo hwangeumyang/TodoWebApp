@@ -36,5 +36,9 @@ public class UserService {
 		}
 		return null;
 	}
+	// db가 없어서 유저 생성됐는 지 체크용.
+	public java.util.List<UserEntity> getAllUsers() {
+		return userRepository.findAll();
+	}
 
 }
