@@ -47,9 +47,8 @@ dependencies {
 	
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.2.4'
-	// https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
-	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.1.0'
-	
+	// https://mvnrepository.com/artifact/mysql/mysql-connector-java
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
 	
 }
 
@@ -66,7 +65,7 @@ task('release') {
 		/* exec - 커맨 라인 프로세서; 파워셀, 터미널에서 실행하는 것과 같다. */
 		exec {
 			/* $eb setenv SPRING_PROFILES_ACTIVE=prod */
-			commandLine 'eb', 'setenv', 'SPRING_PROFILES_ACTIVE=prod'
+			commandLine 'eb', 'setenv', 'spring_profiles_active=prod'
 			standardOutput = stdout
 		}
 		/* 결과 로깅을 위한 작업 */
