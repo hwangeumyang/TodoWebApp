@@ -3,7 +3,7 @@
 SWAPFILE = /var/swapfile
 
 if [ -f $SWAPFILE ]; then
-    then echo "$SWAPFILE found, skip"
+    echo "$SWAPFILE found, skip"
     exit;
 fi
 
