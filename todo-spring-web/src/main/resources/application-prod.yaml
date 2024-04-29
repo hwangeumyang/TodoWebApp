@@ -4,11 +4,11 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
-datasource:
-  url: jdbc:mysql://${rds.hostname}:${rds.port}/ebdb
-  username: ${rds.username}
-  password: ${rds.password}
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://${rds.hostname}:${rds.port}/${rds.db.name}
+    username: ${rds.username}
+    password: ${rds.password}
 logging:
   level:
     org.hibernate.SQL: DEBUG
