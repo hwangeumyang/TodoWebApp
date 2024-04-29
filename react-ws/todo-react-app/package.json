@@ -22,7 +22,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "postinstall": "chmod +x ./node_modules/.bin/react-scripts"
+    "postinstall": "chmod +x /var/app/current/node_modules/.bin/react-scripts"
   },
   "eslintConfig": {
     "extends": [
