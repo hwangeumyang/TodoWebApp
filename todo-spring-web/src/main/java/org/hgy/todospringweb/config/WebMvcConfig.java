@@ -12,7 +12,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	public void addCorsMappings(CorsRegistry registry) {
 		//모든 경로
 		registry.addMapping("/**")
-			.allowedOrigins("http://localhost:3000") // origin 허용
+			.allowedOrigins("http://localhost:3000", "http://prod-todo-api-service-3.ap-northeast-2.elasticbeanstalk.com") // origin 허용
 			.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 			.allowedHeaders("*")
 			.allowCredentials(true) //모든 헤더, 인증에 관한 정보 허용
