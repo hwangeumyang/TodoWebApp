@@ -24,6 +24,9 @@ function AppRouter() {
                     <Route path="/" element={<App />} />
                     <Route path="login" element={<Login />} />
                     <Route path="signup" element={<SignUp />} />
+                    <Route path="health">
+                        <h3>this is heathy</h3>
+                    </Route>
                 </Routes>
             </BrowserRouter>
             <Box mt={5}>
