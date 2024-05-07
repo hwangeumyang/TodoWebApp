@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -35,10 +36,17 @@ public class SecurityConfiguration {
         	)
         	.authorizeHttpRequests((authorizeRequests) -> // /, /auth/**는 인증안함
         							authorizeRequests
-        							.requestMatchers("/", "/auth/**").permitAll()
+        							.requestMatchers("/", "/auth/**", "oauth2/**").permitAll()
         							.anyRequest().authenticated())
         	.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class)
-            ;
+        	.oauth2Login(Customizer.withDefaults())
+        	/*
+        	.oauth2Login(oauth2 -> oauth2
+        			.redirectionEndpoint(redirection -> redirection
+        					.baseUri("/oauth2/callback/*")
+        			)
+        	)
+        	*/;
 
         //필터 등록, 매 요청마다 corsfilter 실행 후 jwtauthenticationfilter 실행
 //        http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);

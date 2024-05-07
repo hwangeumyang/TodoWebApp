@@ -1,0 +1,15 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: Ov23lim73OFXrkhAOEte
+            clientSecret: b70d515ca934e8703801d5d8de74e45f5b3c8871
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - user:email
+              - read:user
+  provider:
+    github:
+      authorization-uri: https://github.com/login/oauth/authorize
