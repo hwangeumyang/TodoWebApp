@@ -3,9 +3,13 @@ package org.hgy.todospringweb.security;
 import org.hgy.todospringweb.model.UserEntity;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
 import javax.crypto.SecretKey;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -34,6 +38,19 @@ public class TokenProvider {
 				.expiration(expiryDate)
 				.signWith(SECRET_KEY, Jwts.SIG.HS512)
 				.compact();
+	}
+	
+	public String create(Authentication authentication) {
+		ApplicationOAuth2User userPrincipal = (ApplicationOAuth2User) authentication.getPrincipal();
+		Date expiryDate = Date.from(
+				Instant.now()
+					.plus(1, ChronoUnit.DAYS));
+		return Jwts.builder()
+				.subject(userPrincipal.getName())
+				.issuedAt(new Date())
+				.expiration(expiryDate)
+				.signWith(SECRET_KEY, Jwts.SIG.HS512)
+				.compact();				
 	}
 	
 	public String validateAndGetUserId(String token) {	

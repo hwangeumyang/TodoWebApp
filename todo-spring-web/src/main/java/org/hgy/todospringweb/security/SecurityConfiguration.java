@@ -21,6 +21,12 @@ public class SecurityConfiguration {
 	@Autowired
 	private JwtAuthenticationFilter jwtAuthenticationFilter;
 	
+	@Autowired
+	private OAuthUserServiceImpl oAuthUserService;
+	
+	@Autowired
+	private OAuthSuccessHandler oAuthSuccessHandler;
+	
 	@Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -39,14 +45,15 @@ public class SecurityConfiguration {
         							.requestMatchers("/", "/auth/**", "oauth2/**").permitAll()
         							.anyRequest().authenticated())
         	.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class)
-        	.oauth2Login(Customizer.withDefaults())
-        	/*
         	.oauth2Login(oauth2 -> oauth2
         			.redirectionEndpoint(redirection -> redirection
         					.baseUri("/oauth2/callback/*")
         			)
-        	)
-        	*/;
+        			.userInfoEndpoint(userInfo -> userInfo
+        					.userService(oAuthUserService) //oAuthUserServiceImpl을 유저 서비스로 등록
+        			)
+        			.successHandler(oAuthSuccessHandler)
+        	);
 
         //필터 등록, 매 요청마다 corsfilter 실행 후 jwtauthenticationfilter 실행
 //        http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
