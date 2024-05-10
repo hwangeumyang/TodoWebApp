@@ -69,6 +69,11 @@ export function signin(userDTO) {
             console.log("error", error);
         });
 }
+
+export function socialLogin(provider) {
+    window.location.href = API_BASE_URL + "/auth/authorize/" + provider;
+}
+
 export function signout() {
     localStorage.setItem("ACCESS_TOKEN", null);
     window.location.href = "/login";

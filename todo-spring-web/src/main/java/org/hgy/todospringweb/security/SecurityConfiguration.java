@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.web.filter.CorsFilter;
 
 @Slf4j
@@ -49,10 +50,16 @@ public class SecurityConfiguration {
         			.redirectionEndpoint(redirection -> redirection
         					.baseUri("/oauth2/callback/*")
         			)
+        			.authorizationEndpoint(authorization -> authorization
+        					.baseUri("/auth/authorize")
+        			)
         			.userInfoEndpoint(userInfo -> userInfo
         					.userService(oAuthUserService) //oAuthUserServiceImpl을 유저 서비스로 등록
         			)
         			.successHandler(oAuthSuccessHandler)
+        	)
+        	.exceptionHandling(exceptionHandling -> exceptionHandling
+        			.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
         	);
 
         //필터 등록, 매 요청마다 corsfilter 실행 후 jwtauthenticationfilter 실행
