@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.hgy.todospringweb.security.RedirectUrlCokkieFilter.REDIRECT_URI_PARAM;
+import static org.hgy.todospringweb.config.WebMvcConfig.ALLOWED_ORIGINS;
 
 @Slf4j
 @Component
@@ -33,8 +34,11 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 		Optional<Cookie> oCookie = Arrays.stream(request.getCookies())
 									.filter(cookie -> cookie.getName().equals(REDIRECT_URI_PARAM)).findFirst();
 		Optional<String> redirectUri = oCookie.map(Cookie::getValue);
-
-
+		
+		for(String origin : ALLOWED_ORIGINS) {
+			
+		}
+		
 		//보안 상 주석 처리
 		//log.info("token {}", token);
 		response.sendRedirect(redirectUri.orElseGet(() -> LOCAL_REDIRECT_URL) + "/sociallogin?token=" + token);
