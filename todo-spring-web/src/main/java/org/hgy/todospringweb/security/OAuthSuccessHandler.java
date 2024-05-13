@@ -34,9 +34,11 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 									.filter(cookie -> cookie.getName().equals(REDIRECT_URI_PARAM)).findFirst();
 		Optional<String> redirectUri = oCookie.map(Cookie::getValue);
 
-		log.info("token {}", token);
-		//response.sendRedirect(redirectUri.orElseGet(() -> LOCAL_REDIRECT_URL) + "/sociallogin?token=" + token);
-		response.sendRedirect("http://localhost:3000/sociallogin?token=" + token);
+
+		//보안 상 주석 처리
+		//log.info("token {}", token);
+		response.sendRedirect(redirectUri.orElseGet(() -> LOCAL_REDIRECT_URL) + "/sociallogin?token=" + token);
+		//response.sendRedirect("http://localhost:3000/sociallogin?token=" + token);
 	}
 
 }

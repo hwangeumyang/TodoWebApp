@@ -22,6 +22,7 @@ public class OAuthUserServiceImpl extends DefaultOAuth2UserService {
 		super();
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 		// DefaultOAuth2UserSerivice의 기존 loadUser를 호출
@@ -29,6 +30,7 @@ public class OAuthUserServiceImpl extends DefaultOAuth2UserService {
 		final OAuth2User oAuth2User = super.loadUser(userRequest);
 		try {
 			//디벅깅용 사용자 정보 로깅. 테스트 시에만 사용할 것.
+			if(false) //코드는 남기고 싶지만, 사용하게 하고 싶지 않아서 임시처리
 			log.info("OAuth2User attributges {} ", new ObjectMapper().writeValueAsString(oAuth2User.getAttributes()));
 		} catch(JsonProcessingException e) {
 			e.printStackTrace();
