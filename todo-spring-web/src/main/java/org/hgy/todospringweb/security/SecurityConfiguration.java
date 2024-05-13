@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.web.filter.CorsFilter;
@@ -28,6 +29,9 @@ public class SecurityConfiguration {
 	@Autowired
 	private OAuthSuccessHandler oAuthSuccessHandler;
 	
+	@Autowired
+	private RedirectUrlCokkieFilter redirectUrlCokkieFilter;
+	
 	@Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -45,7 +49,6 @@ public class SecurityConfiguration {
         							authorizeRequests
         							.requestMatchers("/", "/auth/**", "oauth2/**").permitAll()
         							.anyRequest().authenticated())
-        	.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class)
         	.oauth2Login(oauth2 -> oauth2
         			.redirectionEndpoint(redirection -> redirection
         					.baseUri("/oauth2/callback/*")
@@ -58,9 +61,17 @@ public class SecurityConfiguration {
         			)
         			.successHandler(oAuthSuccessHandler)
         	)
+        	.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class)
+        	.addFilterBefore(redirectUrlCokkieFilter, OAuth2AuthorizationRequestRedirectFilter.class)
         	.exceptionHandling(exceptionHandling -> exceptionHandling
         			.authenticationEntryPoint(new Http403ForbiddenEntryPoint())
         	);
+        
+        //책에서는 이 위치, 그러나 위에 합쳐서 구성해도 상관없는 것 같다.
+//        http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
+//        http.addFilterBefore(redirectUrlCokkieFilter, OAuth2AuthorizationRequestRedirectFilter.class);
+        
+
 
         //필터 등록, 매 요청마다 corsfilter 실행 후 jwtauthenticationfilter 실행
 //        http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
