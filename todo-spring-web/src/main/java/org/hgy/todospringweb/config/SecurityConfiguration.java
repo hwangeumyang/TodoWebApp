@@ -76,7 +76,6 @@ public class SecurityConfiguration {
 //        http.addFilterBefore(redirectUrlCokkieFilter, OAuth2AuthorizationRequestRedirectFilter.class);
         
 
-
         //필터 등록, 매 요청마다 corsfilter 실행 후 jwtauthenticationfilter 실행
 //        http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
             

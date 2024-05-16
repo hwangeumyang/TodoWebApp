@@ -62,8 +62,6 @@ export function signin(userDTO) {
                 localStorage.setItem("ACCESS_TOKEN", response.token);
                 window.location.href="/";
             }
-            
-            
         })
         .catch((error) => {
             console.log("error", error);
